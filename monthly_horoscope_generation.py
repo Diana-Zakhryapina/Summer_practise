@@ -1,6 +1,8 @@
-import random
 import datetime
+import random
 
+
+# Списки предложений для каждой части гороскопа
 first = ["Сегодня — идеальный день для новых начинаний.",
          "Оптимальный день для того, чтобы решиться на смелый поступок!",
          "Будьте осторожны, сегодня звёзды могут повлиять на ваше финансовое состояние.",
@@ -25,22 +27,24 @@ third = ["Злые языки могут говорить вам обратно�
          "Не нужно бояться одиноких встреч — сегодня то самое время, когда они значат многое.",
          "Если встретите незнакомца на пути — проявите участие, и тогда эта встреча посулит вам приятные хлопоты."]
 
+# Словарь, хранящий знаки зодиака и соответствующие гороскопы
 zodiac_signs = {
-    "Водолей": None,
-    "Рыбы": None,
-    "Овен": None,
-    "Телец": None,
-    "Близнецы": None,
-    "Рак": None,
-    "Лев": None,
-    "Дева": None,
-    "Весы": None,
-    "Скорпион": None,
-    "Стрелец": None,
-    "Козерог": None
+    "January": {"signs": [], "horoscopes": []},
+    "February": {"signs": [], "horoscopes": []},
+    "March": {"signs": [], "horoscopes": []},
+    "April": {"signs": [], "horoscopes": []},
+    "May": {"signs": [], "horoscopes": []},
+    "June": {"signs": [], "horoscopes": []},
+    "July": {"signs": [], "horoscopes": []},
+    "August": {"signs": [], "horoscopes": []},
+    "September": {"signs": [], "horoscopes": []},
+    "October": {"signs": [], "horoscopes": []},
+    "November": {"signs": [], "horoscopes": []},
+    "December": {"signs": [], "horoscopes": []}
 }
 
 
+# Определение знака зодиака на основе месяца и дня рождения
 def determine_zodiac_sign(month, day):
     if (month == 1 and day >= 20) or (month == 2 and day <= 18):
         zodiac_sign = "Водолей"
@@ -70,6 +74,7 @@ def determine_zodiac_sign(month, day):
     return zodiac_sign
 
 
+# Генерация случайного гороскопа
 def generate_horoscope():
     first_horoscope = random.choice(first)
     second_horoscope = random.choice(second)
@@ -78,30 +83,50 @@ def generate_horoscope():
     return f"{first_horoscope} {second_horoscope} {second_add_horoscope} {third_horoscope}"
 
 
-def get_horoscope(zodiac_sign):
-    current_date = datetime.date.today().strftime("%Y-%m-%d")
+# Обновление словаря zodiac_signs для текущего месяца
+def update_zodiac_signs():
+    current_month = datetime.datetime.now().strftime("%B")  # Получаем текущий месяц в формате полного названия (например, "June")
+    zodiac_signs[current_month]["signs"] = []  # Очищаем список знаков зодиака
+    zodiac_signs[current_month]["horoscopes"] = []  # Очищаем список гороскопов
 
-    if zodiac_signs[zodiac_sign] is None or zodiac_signs[zodiac_sign][0] != current_date:
-        horoscope = generate_horoscope()
-        zodiac_signs[zodiac_sign] = (current_date, horoscope)
+    for _ in range(12):
+        zodiac_sign = random.choice(list(zodiac_signs.keys()))  # Случайный выбор знака зодиака
+        horoscope = generate_horoscope()  # Генерация случайного гороскопа
+        zodiac_signs[current_month]["signs"].append(zodiac_sign)  # Добавляем знак зодиака в список
+        zodiac_signs[current_month]["horoscopes"].append(horoscope)  # Добавляем гороскоп в список
+
+
+# Получение гороскопа для знака зодиака
+def get_horoscope(zodiac_sign):
+    current_month = datetime.datetime.now().strftime("%B")  # Получаем текущий месяц в формате полного названия (например, "June")
+    signs = zodiac_signs[current_month]["signs"]
+    horoscopes = zodiac_signs[current_month]["horoscopes"]
+
+    if zodiac_sign in signs:
+        index = signs.index(zodiac_sign)  # Индекс знака зодиака в списке
+        horoscope = horoscopes[index]  # Получаем гороскоп по индексу
     else:
-        horoscope = zodiac_signs[zodiac_sign][1]
+        horoscope = generate_horoscope()  # Генерируем новый гороскоп
+        zodiac_signs[current_month]["signs"].append(zodiac_sign)  # Добавляем знак зодиака в список
+        zodiac_signs[current_month]["horoscopes"].append(horoscope)  # Добавляем гороскоп в список
 
     return horoscope
 
 
-print('Добро пожаловать на наш сайт с гороскопом! Здесь вы найдете '
-      'уникальные и точные предсказания, которые помогут вам раскрыть '
-      'потенциал каждого дня. Позвольте звездам провести вас сквозь жизненные '
-      'вызовы и откройте двери к новым возможностям с нашими подробными гороскопами.')
+# Основная функция
+def main():
+    current_month = datetime.datetime.now().strftime("%B")  # Получаем текущий месяц в формате полного названия (например, "June")
+    if not zodiac_signs[current_month]["signs"] or not zodiac_signs[current_month]["horoscopes"]:
+        update_zodiac_signs()  # Обновляем словарь zodiac_signs для текущего месяца
+
+    month = int(input("Введите номер месяца вашего рождения: "))
+    day = int(input("Введите число вашего рождения: "))
+    zodiac_sign = determine_zodiac_sign(month, day)
+    horoscope = get_horoscope(zodiac_sign)
+    print(f"Ваш знак зодиака: {zodiac_sign}")
+    print(f"Ваш гороскоп на текущий месяц: {horoscope}")
 
 
-month = int(input("Пожалуйста введите месяц вашего рождения (числом): "))
-day = int(input("Введите день вашего рождения: "))
-
-sign = determine_zodiac_sign(month, day)
-print(f"Ваш знак зодиака - {sign}. Вот ваш прогноз на сегодня:")
-
-horoscope = get_horoscope(sign)
-
-print(horoscope)
+# Вызов основной функции
+if __name__ == "__main__":
+    main()
