@@ -1,6 +1,9 @@
 import datetime
 import random
+from flask import Flask, render_template, request
+from urllib.parse import urlparse, parse_qs
 
+app = Flask(__name__)
 
 # Списки предложений для каждой части гороскопа
 first = ["Сегодня — идеальный день для новых начинаний.",
@@ -9,11 +12,11 @@ first = ["Сегодня — идеальный день для новых на�
          "Лучшее время для того, чтобы начать новые отношения или разобраться со старыми.",
          "Плодотворный день для того, чтобы разобраться с накопившимися делами."]
 
-second = ["Но помните, что даже в этом случае нужно не забывать про",
-          "Если поедете за город, заранее подумайте про",
-          "Те, кто сегодня нацелен выполнить множество дел, должны помнить про",
-          "Если у вас упадок сил, обратите внимание на",
-          "Помните, что мысли материальны, а значит вам в течение дня нужно постоянно думать про"]
+second = ["Но помните, что даже в этом случае нужно не забывать про.",
+          "Если поедете за город, заранее подумайте про.",
+          "Те, кто сегодня нацелен выполнить множество дел, должны помнить про.",
+          "Если у вас упадок сил, обратите внимание на.",
+          "Помните, что мысли материальны, а значит вам в течение дня нужно постоянно думать про."]
 
 second_add = ["отношения с друзьями и близкими.",
               "работу и деловые вопросы, которые могут так некстати помешать планам.",
@@ -44,36 +47,6 @@ zodiac_signs = {
 }
 
 
-# Определение знака зодиака на основе месяца и дня рождения
-def determine_zodiac_sign(month, day):
-    if (month == 1 and day >= 20) or (month == 2 and day <= 18):
-        zodiac_sign = "Водолей"
-    elif (month == 2 and day >= 19) or (month == 3 and day <= 20):
-        zodiac_sign = "Рыбы"
-    elif (month == 3 and day >= 21) or (month == 4 and day <= 19):
-        zodiac_sign = "Овен"
-    elif (month == 4 and day >= 20) or (month == 5 and day <= 20):
-        zodiac_sign = "Телец"
-    elif (month == 5 and day >= 21) or (month == 6 and day <= 20):
-        zodiac_sign = "Близнецы"
-    elif (month == 6 and day >= 21) or (month == 7 and day <= 22):
-        zodiac_sign = "Рак"
-    elif (month == 7 and day >= 23) or (month == 8 and day <= 22):
-        zodiac_sign = "Лев"
-    elif (month == 8 and day >= 23) or (month == 9 and day <= 22):
-        zodiac_sign = "Дева"
-    elif (month == 9 and day >= 23) or (month == 10 and day <= 22):
-        zodiac_sign = "Весы"
-    elif (month == 10 and day >= 23) or (month == 11 and day <= 21):
-        zodiac_sign = "Скорпион"
-    elif (month == 11 and day >= 22) or (month == 12 and day <= 21):
-        zodiac_sign = "Стрелец"
-    else:
-        zodiac_sign = "Козерог"
-
-    return zodiac_sign
-
-
 # Генерация случайного гороскопа
 def generate_horoscope():
     first_horoscope = random.choice(first)
@@ -85,48 +58,70 @@ def generate_horoscope():
 
 # Обновление словаря zodiac_signs для текущего месяца
 def update_zodiac_signs():
-    current_month = datetime.datetime.now().strftime("%B")  # Получаем текущий месяц в формате полного названия (например, "June")
-    zodiac_signs[current_month]["signs"] = []  # Очищаем список знаков зодиака
-    zodiac_signs[current_month]["horoscopes"] = []  # Очищаем список гороскопов
+    current_month = datetime.datetime.now().strftime("%B")
+    zodiac_signs[current_month]["signs"] = []
+    zodiac_signs[current_month]["horoscopes"] = []
 
     for _ in range(12):
-        zodiac_sign = random.choice(list(zodiac_signs.keys()))  # Случайный выбор знака зодиака
-        horoscope = generate_horoscope()  # Генерация случайного гороскопа
-        zodiac_signs[current_month]["signs"].append(zodiac_sign)  # Добавляем знак зодиака в список
-        zodiac_signs[current_month]["horoscopes"].append(horoscope)  # Добавляем гороскоп в список
+        zodiac_sign = random.choice(list(zodiac_signs.keys()))
+        horoscope = generate_horoscope()
+        zodiac_signs[current_month]["signs"].append(zodiac_sign)
+        zodiac_signs[current_month]["horoscopes"].append(horoscope)
 
 
 # Получение гороскопа для знака зодиака
 def get_horoscope(zodiac_sign):
-    current_month = datetime.datetime.now().strftime("%B")  # Получаем текущий месяц в формате полного названия (например, "June")
+    current_month = datetime.datetime.now().strftime("%B")
     signs = zodiac_signs[current_month]["signs"]
     horoscopes = zodiac_signs[current_month]["horoscopes"]
 
     if zodiac_sign in signs:
-        index = signs.index(zodiac_sign)  # Индекс знака зодиака в списке
-        horoscope = horoscopes[index]  # Получаем гороскоп по индексу
+        index = signs.index(zodiac_sign)
+        horoscope = horoscopes[index]
     else:
-        horoscope = generate_horoscope()  # Генерируем новый гороскоп
-        zodiac_signs[current_month]["signs"].append(zodiac_sign)  # Добавляем знак зодиака в список
-        zodiac_signs[current_month]["horoscopes"].append(horoscope)  # Добавляем гороскоп в список
+        horoscope = generate_horoscope()
+        zodiac_signs[current_month]["signs"].append(zodiac_sign)
+        zodiac_signs[current_month]["horoscopes"].append(horoscope)
 
     return horoscope
 
+@app.route('/')
+def index():
+    return render_template("index.html")
+
+@app.route('/sign/')
+def sign():
+    sign = request.args.get('sign')
+    return render_template("sign.html")
+
+@app.route('/planet/')
+def planet():
+    sign = request.args.get('sign')
+    return render_template("planet.html")
 
 # Основная функция
-def main():
-    current_month = datetime.datetime.now().strftime("%B")  # Получаем текущий месяц в формате полного названия (например, "June")
+@app.route('/horoscope/')
+def horoscope():
+    current_month = datetime.datetime.now().strftime("%B")
     if not zodiac_signs[current_month]["signs"] or not zodiac_signs[current_month]["horoscopes"]:
-        update_zodiac_signs()  # Обновляем словарь zodiac_signs для текущего месяца
+        update_zodiac_signs()
 
-    month = int(input("Введите номер месяца вашего рождения: "))
-    day = int(input("Введите число вашего рождения: "))
-    zodiac_sign = determine_zodiac_sign(month, day)
+    # Получение значения параметра 'sign' из запроса
+    zodiac_sign = request.args.get('sign')
+
+    if zodiac_sign is None:
+        # Здесь можно вернуть ошибку или предоставить значение по умолчанию
+        return "Знак зодиака не указан"
+
     horoscope = get_horoscope(zodiac_sign)
-    print(f"Ваш знак зодиака: {zodiac_sign}")
-    print(f"Ваш гороскоп на текущий месяц: {horoscope}")
+    new_horoscope = horoscope.split('.')
+    # print(f"Ваш знак зодиака: {zodiac_sign}")
+    first_sent = new_horoscope[0] + '.'
+    second_sent = new_horoscope[1] + new_horoscope[2] + '.'
+    third_sent = new_horoscope[3] + '.'
+    return render_template('horoscope.html', first=first_sent, second=second_sent,
+                           third=third_sent)
 
 
-# Вызов основной функции
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    app.run(host='127.0.0.1', port=8000, debug=True)
