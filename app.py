@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect
 
 app = Flask(__name__)
-
+# ВНОШУ ИЗМЕНЕНИЯ ДЛЯ ПРОВЕРКИ ПУНКТА 8
 @app.route('/')
 def index():
     return render_template('index.html')
