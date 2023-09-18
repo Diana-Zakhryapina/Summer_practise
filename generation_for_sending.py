@@ -55,7 +55,6 @@ def generate_horoscope():
     third_horoscope = random.choice(third)
     return f"{first_horoscope} {second_horoscope} {second_add_horoscope} {third_horoscope}"
 
-
 # Проверяем текущую дату
 current_date = datetime.now().date()
 

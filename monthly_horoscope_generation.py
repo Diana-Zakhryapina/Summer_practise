@@ -4,7 +4,7 @@ import random
 
 # Списки предложений для каждой части гороскопа
 first = ["Сегодня — идеальный день для новых начинаний.",
-         "Оптимальный день для того, чтобы решиться на смелый поступок!",
+         "Оптимальный день для того, чтобы решиться на смелый поступок.",
          "Будьте осторожны, сегодня звёзды могут повлиять на ваше финансовое состояние.",
          "Лучшее время для того, чтобы начать новые отношения или разобраться со старыми.",
          "Плодотворный день для того, чтобы разобраться с накопившимися делами."]
@@ -81,21 +81,3 @@ def get_horoscope(zodiac_sign):
         zodiac_signs[current_month]["horoscopes"].append(horoscope)
 
     return horoscope
-
-
-if __name__ == '__main__':
-    sign = input("Введите знак зодиака: ")
-    horoscope_output = get_horoscope(sign)
-    with open('horoscope.html', 'w') as file:
-        file.write(horoscope_output)
-
-
-# @app.route('/sign/')
-# def sign():
-#     sign = request.args.get('sign')
-#     return render_template("sign.html")
-#
-# @app.route('/planet/')
-# def planet():
-#     sign = request.args.get('sign')
-#     return render_template("planet.html")
